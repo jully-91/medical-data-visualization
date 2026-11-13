@@ -126,31 +126,45 @@
 
 ## 模型权重获取（首次运行必做）
 
-`machine/medical_model.pth`（约 390 MB）与 `machine/bert-base-chinese/pytorch_model.bin`（约 411 MB）
-体积过大，**未纳入 git 仓库**，需从本仓库的 **Releases** 页面下载：
+`machine/medical_model.pth`（390.22 MB）与 `machine/bert-base-chinese/pytorch_model.bin`（392.51 MB）
+体积较大，**未纳入 git 仓库**（避免占用 LFS 配额、拖慢克隆），从
+[v1.0-weights Release](https://github.com/jully-91/medical-data-visualization/releases/tag/v1.0-weights) 下载。
 
-1. 打开仓库 Releases 页面，在最新版本中下载两个附件：
-   - `medical_model.pth`
-   - `pytorch_model.bin`
+### 方式一：一键下载脚本（推荐）
 
-2. 放到以下位置（文件名保持不变）：
+在项目根目录（与 `app.py` 同级）执行：
 
-   ```
-   machine/medical_model.pth
-   machine/bert-base-chinese/pytorch_model.bin
-   ```
+```bash
+python download_weights.py
+```
 
-3. 可选：校验文件大小
+脚本会自动下载两个权重、放到正确目录，并校验文件大小。
 
-   | 文件 | 期望字节数 |
-   |---|---|
-   | `medical_model.pth` | 409,170,336 |
-   | `pytorch_model.bin` | 411,577,189 |
+### 方式二：手动下载
+
+| 文件 | 下载地址 | 放置路径 |
+|---|---|---|
+| `medical_model.pth` | [点击下载](https://github.com/jully-91/medical-data-visualization/releases/download/v1.0-weights/medical_model.pth) | `machine/medical_model.pth` |
+| `pytorch_model.bin` | [点击下载](https://github.com/jully-91/medical-data-visualization/releases/download/v1.0-weights/pytorch_model.bin) | `machine/bert-base-chinese/pytorch_model.bin` |
+
+也可用命令行下载（Windows PowerShell）：
+
+```powershell
+curl.exe -L -o machine/medical_model.pth "https://github.com/jully-91/medical-data-visualization/releases/download/v1.0-weights/medical_model.pth"
+curl.exe -L -o machine/bert-base-chinese/pytorch_model.bin "https://github.com/jully-91/medical-data-visualization/releases/download/v1.0-weights/pytorch_model.bin"
+```
+
+校验文件大小：
+
+| 文件 | 期望字节数 |
+|---|---|
+| `medical_model.pth` | 409,170,336 |
+| `pytorch_model.bin` | 411,577,189 |
 
 > **未放置权重时**：大屏可视化、数据管理、报告生成等功能均可正常使用，
 > 仅「数据预测」页面会提示「模型尚未加载」。
 
-### 方式二：自行重新训练
+### 方式三：自行重新训练
 
 若无法下载，也可基于数据库中的病例数据重新训练（需先完成下方数据库初始化）：
 
