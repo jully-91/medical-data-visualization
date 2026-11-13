@@ -302,6 +302,32 @@ python -m spiders.start_scheduler --action list
 python -m spiders.start_scheduler --action run --job crawl_all_diseases
 ```
 
+#### 4.5 停止服务
+
+| 启动方式 | 停止方法 |
+|---|---|
+| 双击 `start-*.bat` | 直接**关闭对应标题的窗口**（`Flask-5000` / `SocketIO-5001` / `Vue-8080`）；或在窗口内按 `Ctrl+C`，出现“终止批处理操作吗(Y/N)?”时按 `Y` |
+| 手动开终端 | 在对应终端按 `Ctrl+C` |
+
+窗口找不到了、端口被占用、或进程卡死时，**按端口强制结束**：
+
+```powershell
+5000,5001,8080 | ForEach-Object {
+    Get-NetTCPConnection -LocalPort $_ -State Listen -ErrorAction SilentlyContinue |
+        Select-Object -ExpandProperty OwningProcess -Unique |
+        ForEach-Object { Stop-Process -Id $_ -Force -ErrorAction SilentlyContinue }
+}
+```
+
+确认是否已全部停止（**无输出**即表示三个端口都已释放）：
+
+```powershell
+Get-NetTCPConnection -State Listen | Where-Object { $_.LocalPort -in 5000,5001,8080 }
+```
+
+> ⚠️ 不建议随手执行 `Get-Process -Name python,node | Stop-Process -Force`，
+> 会连**其他项目**的 Python / Node 进程一起杀掉。
+
 ### 5. 访问系统
 - 前端地址：http://localhost:8080
 - Flask API：http://localhost:5000
