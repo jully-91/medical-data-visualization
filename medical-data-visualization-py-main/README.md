@@ -136,11 +136,11 @@
 
 在项目根目录（与 `app.py` 同级）执行：
 
-```bash
-python download_weights.py
+```powershell
+.\venv\Scripts\python.exe download_weights.py
 ```
 
-脚本会自动下载两个权重、放到正确目录，并校验文件大小。
+脚本会自动下载两个权重、放到正确目录，并校验文件大小（已存在且大小正确则跳过，支持断点续传）。
 
 ### 方式二：手动下载
 
@@ -170,8 +170,8 @@ curl.exe -L -o machine/bert-base-chinese/pytorch_model.bin "https://github.com/j
 
 若无法下载，也可基于数据库中的病例数据重新训练（需先完成下方数据库初始化）：
 
-```bash
-python -m machine.tree
+```powershell
+.\venv\Scripts\python.exe -m machine.tree
 ```
 
 默认 10 个 epoch，28 核 CPU 约 9 分钟。脚本会自动生成
@@ -205,15 +205,23 @@ cd 基于python医疗疾病数据分析大屏可视化系统
 ### 2. 后端安装
 
 #### 创建Python虚拟环境（推荐）
-```bash
-# Windows
-python -m venv venv
-venv\Scripts\activate
+**必须用 Python 3.10.x 创建**（`torch==2.1.2` / `pandas==1.4.3` / `matplotlib==3.5.2`
+只在 3.10/3.11 有预编译轮子）。请在项目根目录执行：
+
+```powershell
+# Windows：直接用 3.10 的绝对路径创建，避免被 PATH 里的其他版本顶掉
+& "C:\Users\<你>\AppData\Local\Programs\Python\Python310\python.exe" -m venv venv
 
 # macOS/Linux
-python3 -m venv venv
-source venv/bin/activate
+python3.10 -m venv venv
 ```
+
+> **不必 `activate`**：后面的命令统一写成 `.\venv\Scripts\python.exe xxx.py`，
+> 等价于"激活后再跑"，而且更不容易搞错用的是哪个解释器。
+> 如果你更喜欢激活，Windows 下执行 `.\venv\Scripts\Activate.ps1` 即可。
+
+> ⚠️ venv 是**绑定解释器绝对路径**的。如果以后卸载/移动了 Python 3.10，
+> venv 会直接失效（报 `No Python at ...`），只能删掉重建。
 
 #### 安装Python依赖
 ```bash
@@ -254,10 +262,11 @@ npm install
 3. 在项目根目录导入数据库结构（任选一种方式）：
 
    **方式 A：使用脚本一键导入（推荐）**
-   ```bash
-   # 在项目根目录，已激活虚拟环境
-   python -m spiders.import_database
+   ```powershell
+   # 在项目根目录（与 app.py 同级）
+   .\venv\Scripts\python.exe -m spiders.import_database
    ```
+   > 成功输出：`成功执行 345 条SQL命令` / `✓ cases表创建成功` / `✓ 表中共有 344 条记录`
 
    **方式 B：使用 MySQL 客户端导入 SQL 文件**
    ```bash
@@ -267,39 +276,50 @@ npm install
 
 #### 4.2 启动后端服务
 
-打开两个终端（都在项目根目录，且虚拟环境已激活）：
+打开两个终端，**都在项目根目录（与 `app.py` 同级）**。
+用 venv 里的解释器启动，**不需要先 `activate`**，直接写相对路径即可：
 
-```bash
-# 终端 1：启动 WebSocket 服务（AI 医疗助手，对接 DeepSeek）
-python websocket_chat.py
+```powershell
+# 终端 1：Flask 主服务（REST API + 数据管理 + 报告生成）→ 5000
+.\venv\Scripts\python.exe app.py
 
-# 终端 2：启动 Flask 主服务（REST API + 数据管理 + 报告生成等）
-python app.py
+# 终端 2：WebSocket 服务（AI 医疗助手，对接 DeepSeek）→ 5001
+.\venv\Scripts\python.exe websocket_chat.py
 ```
+
+> **启动顺序**：先 5000，再 8080（前端 `/api` 代理指向 5000）。
+> **后端首次启动约 1~2 分钟**：要加载 390 MB 模型并为 344 条病例计算特征向量，
+> 控制台会先打印 `✅ 模型权重加载成功！` → `✅ 向量库构建完成，共 344 条病例` →
+> `* Running on http://127.0.0.1:5000`。
+
+> 不想开终端就双击 **`start-all.bat`**，一次把三个服务都拉起来。
 
 #### 4.3 启动前端服务
 
-```bash
+```powershell
 cd front-end-template-1-master
+$env:NODE_OPTIONS="--openssl-legacy-provider"   # Node 17+ 必须设置，否则报 0308010C
 npm run serve
 ```
+
+> 前端目录下也有 **`start-dev.bat`**，双击即可启动（已内置 `NODE_OPTIONS` / `chcp 65001`）。
 
 #### 4.4 （可选）启动定时任务 / 爬虫调度
 
 如果希望定时自动爬取数据、同步 CSV 到数据库并周期性重训练模型，可以额外启动定时任务系统：
 
-```bash
+```powershell
 # 在项目根目录
-python -m spiders.start_scheduler --action start
+.\venv\Scripts\python.exe -m spiders.start_scheduler --action start
 ```
 
 常用命令：
-```bash
+```powershell
 # 查看当前已注册的任务
-python -m spiders.start_scheduler --action list
+.\venv\Scripts\python.exe -m spiders.start_scheduler --action list
 
 # 立即运行某个任务（例如：crawl_all_diseases）
-python -m spiders.start_scheduler --action run --job crawl_all_diseases
+.\venv\Scripts\python.exe -m spiders.start_scheduler --action run --job crawl_all_diseases
 ```
 
 #### 4.5 停止服务
@@ -319,10 +339,15 @@ python -m spiders.start_scheduler --action run --job crawl_all_diseases
 }
 ```
 
-确认是否已全部停止（**无输出**即表示三个端口都已释放）：
+确认是否已全部停止 —— **两个命令都没有输出，才算真的停干净**：
 
 ```powershell
+# 1) 三个端口应全部释放（无输出 = 已释放）
 Get-NetTCPConnection -State Listen | Where-Object { $_.LocalPort -in 5000,5001,8080 }
+
+# 2) 应无本项目的残留进程（无输出 = 已清理）
+Get-CimInstance Win32_Process -Filter "Name='python.exe' or Name='node.exe'" |
+    Where-Object { $_.CommandLine -match 'websocket_chat|app\.py|vue-cli-service' }
 ```
 
 > 💡 `websocket_chat.py` 使用 Flask debug 模式（reloader），实际是**三层进程**
