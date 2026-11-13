@@ -124,6 +124,43 @@
             └── ...
 ```
 
+## 模型权重获取（首次运行必做）
+
+`machine/medical_model.pth`（约 390 MB）与 `machine/bert-base-chinese/pytorch_model.bin`（约 411 MB）
+体积过大，**未纳入 git 仓库**，需从本仓库的 **Releases** 页面下载：
+
+1. 打开仓库 Releases 页面，在最新版本中下载两个附件：
+   - `medical_model.pth`
+   - `pytorch_model.bin`
+
+2. 放到以下位置（文件名保持不变）：
+
+   ```
+   machine/medical_model.pth
+   machine/bert-base-chinese/pytorch_model.bin
+   ```
+
+3. 可选：校验文件大小
+
+   | 文件 | 期望字节数 |
+   |---|---|
+   | `medical_model.pth` | 409,170,336 |
+   | `pytorch_model.bin` | 411,577,189 |
+
+> **未放置权重时**：大屏可视化、数据管理、报告生成等功能均可正常使用，
+> 仅「数据预测」页面会提示「模型尚未加载」。
+
+### 方式二：自行重新训练
+
+若无法下载，也可基于数据库中的病例数据重新训练（需先完成下方数据库初始化）：
+
+```bash
+python -m machine.tree
+```
+
+默认 10 个 epoch，28 核 CPU 约 9 分钟。脚本会自动生成
+`machine/medical_model.pth` 与 `machine/classes.npy`。
+
 ## 安装部署
 
 ### 环境要求
