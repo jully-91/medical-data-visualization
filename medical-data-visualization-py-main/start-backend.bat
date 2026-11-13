@@ -4,25 +4,25 @@ title Flask Backend - Port 5000
 cd /d "%~dp0"
 
 echo ============================================================
-echo   Flask 主服务  (REST API / 数据管理 / 报告生成)
-echo   访问地址: http://localhost:5000
+echo   Flask Backend  (REST API / Data / Reports)
+echo   URL: http://localhost:5000
 echo ============================================================
 echo.
-echo  注意: 首次启动需加载 390 MB 模型并为 344 条病例计算特征向量，
-echo        大约需要 1~2 分钟，请耐心等待日志输出。
+echo   First start: load 390 MB model + build 344 case vectors,
+echo   about 1-2 minutes. Please wait for the log output.
 echo.
 
 if not exist ".\venv\Scripts\python.exe" (
-    echo [错误] 未找到虚拟环境: .\venv\Scripts\python.exe
-    echo        请先按 docs\运行手册.md 第 2 章创建虚拟环境并安装依赖。
+    echo [ERROR] venv not found: .\venv\Scripts\python.exe
+    echo         See docs\ for setup instructions.
     echo.
     pause
     exit /b 1
 )
 
 if not exist ".\.env" (
-    echo [警告] 未找到 .env 配置文件，数据库连接会失败。
-    echo        请复制 .env.example 为 .env 并填写 DB_PASSWORD。
+    echo [WARN] .env not found. Database connection will fail.
+    echo        Copy .env.example to .env and set DB_PASSWORD.
     echo.
     pause
 )
@@ -31,6 +31,6 @@ if not exist ".\.env" (
 
 echo.
 echo ============================================================
-echo   Flask 服务已退出（若上方有报错，请根据提示排查）
+echo   Flask backend stopped. Check the log above for errors.
 echo ============================================================
 pause
