@@ -1,0 +1,38 @@
+# ---- macOS 压缩/解压产物 ----
+__MACOSX/
+.DS_Store
+._*
+
+# ---- 环境变量 / 密钥（.env 含真实密码与 API Key，绝不入库）----
+.env
+!.env.example
+
+# ---- 模型权重（体积大，改为 GitHub Release 附件分发，详见 README）----
+# 不占用仓库 / LFS 配额，避免每次 clone 都消耗下载流量
+medical_model.pth
+bert-base-chinese/pytorch_model.bin
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+venv/
+.venv/
+env/
+
+# ---- Node / Vue ----
+node_modules/
+dist/
+npm-debug.log*
+yarn-error.log*
+
+# ---- 安装包 / 二进制分发文件（体积大，不入库）----
+*.msi
+python-*-amd64.exe
+node-*-x64.msi
+
+# ---- IDE / 编辑器 ----
+.idea/
+.vscode/
+*.swp
