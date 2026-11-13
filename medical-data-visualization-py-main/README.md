@@ -325,6 +325,16 @@ python -m spiders.start_scheduler --action run --job crawl_all_diseases
 Get-NetTCPConnection -State Listen | Where-Object { $_.LocalPort -in 5000,5001,8080 }
 ```
 
+> 💡 `websocket_chat.py` 使用 Flask debug 模式（reloader），实际是**三层进程**
+> （终端 → venv 启动器 → 真实 python）。按端口杀往往只命中一层，残留进程会立刻重新占端口。
+> 若复查发现端口仍被占用，用命令定向清理：
+>
+> ```powershell
+> Get-CimInstance Win32_Process -Filter "Name='python.exe'" |
+>     Where-Object { $_.CommandLine -match 'websocket_chat|app\.py' } |
+>     ForEach-Object { Stop-Process -Id $_.ProcessId -Force }
+> ```
+
 > ⚠️ 不建议随手执行 `Get-Process -Name python,node | Stop-Process -Force`，
 > 会连**其他项目**的 Python / Node 进程一起杀掉。
 
