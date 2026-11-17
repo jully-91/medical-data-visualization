@@ -37,3 +37,11 @@ node-*-x64.msi
 .idea/
 .vscode/
 *.swp
+
+# ---- 发布产物 / 部署运行日志 ----
+release/
+deploy/logs/
+deploy/.run/
+
+# ---- 非项目课程材料（答辩 PPT / 报告 / 素材）----
+非项目文件/
